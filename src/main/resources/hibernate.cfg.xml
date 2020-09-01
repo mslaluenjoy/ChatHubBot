@@ -1,0 +1,50 @@
+
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- JDBC Database connection settings -->
+        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/test?useSSL=false&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC&amp;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;tcpKeepAlive=true</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">root</property>
+        <!-- JDBC connection pool settings ... using built-in test pool -->
+        <property name="connection.pool_size">10</property>
+        <!-- Select our SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
+        <!-- Echo the SQL to stdout -->
+        <property name="show_sql">false</property>
+        <!-- Set the current session context -->
+        <property name="current_session_context_class">thread</property>
+        <property name="hbm2ddl.auto">update</property>
+        
+        <property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">50</property>
+        <property name="hibernate.c3p0.acquire_increment">5</property>
+        <property name="hibernate.c3p0.timeout">1800</property>
+        
+        <!-- dbcp connection pool configuration -->
+        <!--        <property name="hibernate.dbcp.initialSize">5</property>
+        <property name="hibernate.dbcp.maxTotal">20</property>
+        <property name="hibernate.dbcp.maxIdle">10</property>
+        <property name="hibernate.dbcp.minIdle">5</property>
+        <property name="hibernate.dbcp.maxWaitMillis">-1</property>-->
+        <property name="connection.autoReconnect">true</property>
+        <property name="connection.autoReconnectForPools">true</property>
+        <property name="connection.is-connection-validation-required">true</property>
+        <mapping class="net.torabipour.ChatHubBot.model.User"/>
+        <mapping class="net.torabipour.ChatHubBot.model.anonChat.Chat"/>
+        <mapping class="net.torabipour.ChatHubBot.model.anonChat.ChatRequest"/>
+        <mapping class="net.torabipour.ChatHubBot.model.anonChat.TargetedChatRequest"/>
+        <mapping class="net.torabipour.ChatHubBot.model.anonChat.Message"/>
+        <mapping class="net.torabipour.ChatHubBot.model.Location"/>
+        <mapping class="net.torabipour.ChatHubBot.model.anonChat.PrivateMessage"/>
+        <mapping class="net.torabipour.ChatHubBot.model.globalChat.ChatMessage"/>
+        <mapping class="net.torabipour.ChatHubBot.model.globalChat.GlobalChatRoom"/>
+        <mapping class="net.torabipour.ChatHubBot.model.globalChat.LocalChatRoom"/>
+        <mapping class="net.torabipour.ChatHubBot.model.globalChat.GlobalPost"/>
+        <mapping class="net.torabipour.ChatHubBot.model.utils.location.Address"/>
+    </session-factory>
+</hibernate-configuration>
