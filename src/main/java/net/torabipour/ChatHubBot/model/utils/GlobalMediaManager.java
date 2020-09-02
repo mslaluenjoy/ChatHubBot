@@ -51,13 +51,15 @@ public abstract class GlobalMediaManager extends MediaManager {
                 response = (SendResponse) getBot().execute(sendGlobalPost(globalPost, chatId, ChatMessage.loadByGlobalPostAndChatId(replyTo, chatId).iterator().next().getMessageId(), gFile));
             }
 
-            ChatMessage cm = new ChatMessage(null, response.message().messageId(), chatId, globalPost);
-            new TransactionalDBAccess() {
-                @Override
-                protected void operation(Session session) {
-                    session.saveOrUpdate(cm);
-                }
-            }.execute();
+            if (response != null && response.message() != null) {
+                ChatMessage cm = new ChatMessage(null, response.message().messageId(), chatId, globalPost);
+                new TransactionalDBAccess() {
+                    @Override
+                    protected void operation(Session session) {
+                        session.saveOrUpdate(cm);
+                    }
+                }.execute();
+            }
 
         }
     }
