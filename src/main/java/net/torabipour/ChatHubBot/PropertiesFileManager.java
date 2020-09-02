@@ -69,7 +69,7 @@ public class PropertiesFileManager {
     }
     
     public Boolean checkForFileSize() {
-        return Boolean.valueOf(readConfigFile().getProperty("checkForFileSize", "false"));
+        return Boolean.valueOf(readConfigFile().getProperty("checkForFileSize", "true"));
     }
     
     public Boolean isTest() {
