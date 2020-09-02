@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -205,6 +207,10 @@ public abstract class MediaManager {
     public String getFullPath(String telegramFileId) throws UserInterfaceException {
         GetFile getFile = new GetFile(telegramFileId);
         com.pengrad.telegrambot.model.File file = getBot().execute(getFile).file();
+        if (file == null) {
+            LoggerFactory.getLogger(this.getClass()).error("telegramFileId : " + telegramFileId);
+            throw new UserInterfaceException("Unable to send file. file not found.");
+        }
         if (PropertiesFileManager.getInstance().checkForFileSize()) {
             if (file.fileSize() > PropertiesFileManager.getInstance().getMaxMediaSizeByte()) {
                 throw new UserInterfaceException("Media size too large. maximum allowed in mega bytes : " + PropertiesFileManager.getInstance().getMaxMediaSizeMB());
