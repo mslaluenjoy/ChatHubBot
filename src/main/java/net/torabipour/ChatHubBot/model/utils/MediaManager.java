@@ -205,8 +205,10 @@ public abstract class MediaManager {
     public String getFullPath(String telegramFileId) throws UserInterfaceException {
         GetFile getFile = new GetFile(telegramFileId);
         com.pengrad.telegrambot.model.File file = getBot().execute(getFile).file();
-        if (file.fileSize() > PropertiesFileManager.getInstance().getMaxMediaSizeByte()) {
-            throw new UserInterfaceException("Media size too large. maximum allowed in mega bytes : " + PropertiesFileManager.getInstance().getMaxMediaSizeMB());
+        if (PropertiesFileManager.getInstance().checkForFileSize()) {
+            if (file.fileSize() > PropertiesFileManager.getInstance().getMaxMediaSizeByte()) {
+                throw new UserInterfaceException("Media size too large. maximum allowed in mega bytes : " + PropertiesFileManager.getInstance().getMaxMediaSizeMB());
+            }
         }
         String fullPath = getBot().getFullFilePath(file);
         return fullPath;

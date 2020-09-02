@@ -68,6 +68,10 @@ public class PropertiesFileManager {
         return Integer.valueOf(readConfigFile().getProperty("maxMediaSizeMB", "10"));
     }
     
+    public Boolean checkForFileSize() {
+        return Boolean.valueOf(readConfigFile().getProperty("checkForFileSize", "false"));
+    }
+    
     public Boolean isTest() {
         return Boolean.valueOf(readConfigFile().getProperty("isTest", "false"));
     }
