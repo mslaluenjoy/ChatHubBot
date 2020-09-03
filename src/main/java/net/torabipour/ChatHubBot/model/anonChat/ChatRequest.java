@@ -33,7 +33,7 @@ import org.hibernate.Session;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @NamedQueries({
-    @NamedQuery(name = "loadProperMatch", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND chat = NULL AND (requester.sex = :targetSex OR :targetSex = NULL) and (targetSex = :requesterSex OR targetSex = NULL) and requester.lang=:lang")
+    @NamedQuery(name = "loadProperMatch", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND chat = NULL AND (requester.sex = :targetSex OR :targetSex = NULL) and (targetSex = :requesterSex OR targetSex = NULL) and requester.lang=:lang ORDER BY date ASC")
     ,
     @NamedQuery(name = "loadProperMatchNoSex", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND chat = NULL and requester.lang=:lang")
     ,
@@ -129,8 +129,7 @@ public class ChatRequest {
     }
 
     public static List<ChatRequest> loadProperMatch(Sex targetSex, Sex requesterSex, Language lang, Session session) {
-        List<ChatRequest> result = session.getNamedQuery("loadProperMatch").setParameter("targetSex", targetSex).setParameter("requesterSex", requesterSex).setParameter("lang", lang).list();
-
+        List<ChatRequest> result = session.getNamedQuery("loadProperMatch").setParameter("targetSex", targetSex).setParameter("requesterSex", requesterSex).setParameter("lang", lang).setMaxResults(1).list();
         return result;
     }
 

@@ -541,7 +541,7 @@ public abstract class BotHandler {
                 User endpoint1 = currentChat.getEndpoint1();
                 User endpoint2 = currentChat.getEndpoint2();
 
-                if ("/terminate".equals(messageText) || "/back".equals(messageText) || "/restart".equals(messageText) || "/leave".equals(messageText)|| "/cancel".equals(messageText)) {
+                if ("/terminate".equals(messageText) || "/back".equals(messageText) || "/restart".equals(messageText) || "/leave".equals(messageText)|| "/cancel".equals(messageText) || "/newchat".equals(messageText)) {
 
                     currentChat.setActive(false);
                     endpoint1.setStatus(UserStatus.Registered);
