@@ -222,7 +222,7 @@ public abstract class BotHandler {
                         session.update(localUser);
                     }
                 }.execute();
-                isEnglish = localUser.getLang() == null ? true : localUser.getLang().equals(Language.English);
+                isEnglish = (localUser.getLang() == null) ? true : localUser.getLang().equals(Language.English);
                 sendSexSelect(message.chat().id(), isEnglish);
                 return;
 
@@ -600,7 +600,7 @@ public abstract class BotHandler {
                         }.copyMessageAndForward(endpoint1.getChatId().equals(message.chat().id()) ? endpoint2.getChatId() : endpoint1.getChatId(), isEnglish);
                     } catch (UserInterfaceException ex) {
                         mediaManager.messageSend(ex.getMessage(), message.chat().id());
-                    }
+                    } 
                 }
 
                 return;

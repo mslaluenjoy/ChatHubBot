@@ -110,52 +110,52 @@ public abstract class AnonymousChatHandler {
                 if (isValid(messageText)) {
                     throw new UserInterfaceException(isEnglish ? "ارسال لینک در چت مجاز نیست." : "Links are not allowed in chats.");
                 }
-                mediaManager.messageSendReply(messageText, chatId, originalReply);
+                response =mediaManager.messageSendReply(messageText, chatId, originalReply);
                 type = MessageType.Text;
                 content = messageText;
             } else if (vid != null) {
-                mediaManager.sendVideoReply(chatId, vid, originalReply, caption);
+                response =mediaManager.sendVideoReply(chatId, vid, originalReply, caption);
                 type = MessageType.Video;
                 content = mediaManager.getFullPath(vid.fileId());
 
             } else if (photo != null) {
-                mediaManager.sendPhotoReply(chatId, photo, originalReply, caption);
+                response =mediaManager.sendPhotoReply(chatId, photo, originalReply, caption);
                 type = MessageType.Photo;
                 content = mediaManager.getFullPath(photo[photo.length - 1].fileId());
 
             } else if (anim != null) {
-                mediaManager.sendAnimReply(chatId, anim, originalReply);
+                response =mediaManager.sendAnimReply(chatId, anim, originalReply);
                 type = MessageType.Animation;
                 content = mediaManager.getFullPath(anim.fileId());
 
             } else if (audio != null) {
-                mediaManager.sendAudioReply(chatId, audio, originalReply, caption);
+                response =mediaManager.sendAudioReply(chatId, audio, originalReply, caption);
                 type = MessageType.Audio;
                 content = mediaManager.getFullPath(audio.fileId());
 
             } else if (doc != null) {
-                mediaManager.sendDocReply(chatId, doc, originalReply, caption);
+                response =mediaManager.sendDocReply(chatId, doc, originalReply, caption);
                 type = MessageType.Document;
                 content = mediaManager.getFullPath(doc.fileId());
 
             } else if (location != null) {
-                mediaManager.sendLocReply(chatId, location, originalReply);
+                response =mediaManager.sendLocReply(chatId, location, originalReply);
                 type = MessageType.Location;
                 content = location.toString();
 
             } else if (sticker != null) {
-                mediaManager.sendStickerReply(chatId, sticker, originalReply);
+                response =mediaManager.sendStickerReply(chatId, sticker, originalReply);
                 type = MessageType.Sticker;
                 content = mediaManager.getFullPath(sticker.fileId());
 
             } else if (voice != null) {
-                mediaManager.sendVoiceReply(chatId, voice, originalReply, caption);
+                response =mediaManager.sendVoiceReply(chatId, voice, originalReply, caption);
                 type = MessageType.Voice;
                 content = mediaManager.getFullPath(voice.fileId());
 
             }
         }
-        if (response != null) {
+        if (response != null && response.message() != null) {
             MessageFactory.createAndSave(content, type, response.message().messageId(), message.messageId(), getCurrentChat(), getLocalUser());
         }
 
