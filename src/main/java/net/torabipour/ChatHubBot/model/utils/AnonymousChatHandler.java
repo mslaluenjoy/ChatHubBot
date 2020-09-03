@@ -70,7 +70,7 @@ public abstract class AnonymousChatHandler {
                 response = mediaManager.messageSend(messageText, chatId);
                 type = MessageType.Text;
                 content = messageText;
-                
+
             } else if (vid != null) {
                 response = mediaManager.sendVideo(chatId, vid, caption);
                 type = MessageType.Video;
@@ -155,8 +155,9 @@ public abstract class AnonymousChatHandler {
 
             }
         }
-
-        MessageFactory.createAndSave(content, type, response.message().messageId(), message.messageId(), getCurrentChat(), getLocalUser());
+        if (response != null) {
+            MessageFactory.createAndSave(content, type, response.message().messageId(), message.messageId(), getCurrentChat(), getLocalUser());
+        }
 
     }
 

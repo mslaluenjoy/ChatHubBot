@@ -40,7 +40,10 @@ public class GlobalPostFactory {
         gp.setGcr(gcr);
 
         if (message.replyToMessage() != null) {
-            gp.setReplyTo(ChatMessage.loadByMessageId(message.replyToMessage().messageId()).getGp());
+            ChatMessage cm = ChatMessage.loadByMessageId(message.replyToMessage().messageId());
+            if (cm != null) {
+                gp.setReplyTo(cm.getGp());
+            }
         }
 
         gp.setTelegramChatId(message.chat().id());

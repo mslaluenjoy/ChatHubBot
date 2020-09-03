@@ -444,7 +444,7 @@ public abstract class BotHandler {
                     }
                 }.execute();
 
-                List<ChatRequest> requests = ChatRequest.loadProperMatch(targetSex, localUser.getSex(),localUser.getLang());
+                List<ChatRequest> requests = ChatRequest.loadProperMatch(targetSex, localUser.getSex(), localUser.getLang());
 
                 if (requests == null || requests.isEmpty()) {
                     sendCanelConnection(message.chat().id(), isEnglish);
@@ -541,7 +541,7 @@ public abstract class BotHandler {
                 User endpoint1 = currentChat.getEndpoint1();
                 User endpoint2 = currentChat.getEndpoint2();
 
-                if ("/terminate".equals(messageText)) {
+                if ("/terminate".equals(messageText) || "/back".equals(messageText) || "/restart".equals(messageText) || "/leave".equals(messageText)|| "/cancel".equals(messageText)) {
 
                     currentChat.setActive(false);
                     endpoint1.setStatus(UserStatus.Registered);
@@ -982,7 +982,11 @@ public abstract class BotHandler {
                 }
                 break;
             case SelectingGlobalChat:
-                if (messageText.equals("Back") || messageText.equals("بازگشت") || messageText.equals("/restart") || messageText.equals("/start")) {
+                if (messageText == null) {
+                    sendGlobalRoomSelect(message.chat().id(), isEnglish);
+                    return;
+                }
+                if ("Back".equals(messageText) || "بازگشت".equals(messageText) || "/restart".equals(messageText) || "/start".equals(messageText)) {
                     localUser.setStatus(UserStatus.Registered);
                     new TransactionalDBAccess() {
                         @Override
@@ -1012,7 +1016,7 @@ public abstract class BotHandler {
                 }
                 break;
             case InGlobalChat:
-                if (messageText != null && (messageText.equals("Leave room") || messageText.equals("خروج") || messageText.equals("/restart") || messageText.equals("/start") || messageText.equals("/leaveglobal"))) {
+                if (messageText != null && (messageText.equals("Leave room") || messageText.equals("خروج") || messageText.equals("/restart") || messageText.equals("/start") || messageText.equals("/leaveglobal") || messageText.equals("/back"))) {
                     localUser.setStatus(UserStatus.Registered);
                     globalMediaManager.notifyUserLeft(localUser.getGcr(), localUser);
                     localUser.setGcr(null);
