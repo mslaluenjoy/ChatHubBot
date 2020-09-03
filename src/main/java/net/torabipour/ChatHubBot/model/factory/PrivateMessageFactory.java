@@ -17,29 +17,26 @@ import net.torabipour.ChatHubBot.model.MessageType;
 import net.torabipour.ChatHubBot.model.User;
 import net.torabipour.ChatHubBot.model.anonChat.Message;
 import net.torabipour.ChatHubBot.model.anonChat.PrivateMessage;
-import net.torabipour.ChatHubBot.model.globalChat.ChatMessage;
-import net.torabipour.ChatHubBot.model.globalChat.GlobalChatRoom;
-import net.torabipour.ChatHubBot.model.globalChat.GlobalPost;
 import net.torabipour.ChatHubBot.model.utils.MediaManager;
 import net.torabipour.ChatHubBot.model.utils.UserInterfaceException;
-import java.util.Date;
+import net.torabipour.ChatHubBot.model.Language;
+import static net.torabipour.ChatHubBot.model.factory.GlobalPostFactory.isValid;
 
 /**
  *
  * @author mohammad
  */
 public class PrivateMessageFactory {
-    
-    
-    public static PrivateMessage create(com.pengrad.telegrambot.model.Message message, User localUser, MediaManager mediaManager) throws UserInterfaceException{
+
+    public static PrivateMessage create(com.pengrad.telegrambot.model.Message message, User localUser, MediaManager mediaManager) throws UserInterfaceException {
         Message lastPm = PrivateMessage.loadBySender(localUser);
         PrivateMessage gp = new PrivateMessage(null, localUser, lastPm.getReceiver(), null, null, null, null, null);
         gp.setCaption(message.caption());
-        setContentAndType(message, mediaManager, gp);
+        setContentAndType(message, mediaManager, gp, localUser.getLang() == null || localUser.getLang().equals(Language.English));
         return gp;
     }
-    
-    private static void setContentAndType(com.pengrad.telegrambot.model.Message message, MediaManager mediaManager, PrivateMessage gp) throws UserInterfaceException{
+
+    private static void setContentAndType(com.pengrad.telegrambot.model.Message message, MediaManager mediaManager, PrivateMessage gp, Boolean isEnglish) throws UserInterfaceException {
         String messageText = message.text();
         Video vid = message.video();
         PhotoSize[] photo = message.photo();
@@ -55,6 +52,9 @@ public class PrivateMessageFactory {
         if (messageText != null && !messageText.isEmpty()) {
             type = MessageType.Text;
             content = messageText;
+            if (isValid(content)) {
+                throw new UserInterfaceException(isEnglish ? "ارسال لینک در چت مجاز نیست." : "Links are not allowed in chats.");
+            }
         } else if (vid != null) {
             type = MessageType.Video;
             content = mediaManager.getFullPath(vid.fileId());

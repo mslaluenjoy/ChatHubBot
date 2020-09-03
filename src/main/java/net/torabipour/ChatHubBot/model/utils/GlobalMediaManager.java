@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import net.torabipour.ChatHubBot.model.globalChat.GlobalChatRoom;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author mohammad
  */
 public abstract class GlobalMediaManager extends MediaManager {
-    
+
     public void emmitPost(GlobalPost globalPost, User localUser) throws UserInterfaceException {
         File gFile = downloadGlobalFile(globalPost);
         List<Long> chatIds = User.loadByGcr(globalPost.getGcr()).stream().map(x -> x.getChatId()).filter(x -> !x.equals(localUser.getChatId())).collect(Collectors.toList());
@@ -51,7 +52,7 @@ public abstract class GlobalMediaManager extends MediaManager {
             } else {
                 response = (SendResponse) getBot().execute(sendGlobalPost(globalPost, chatId, ChatMessage.loadByGlobalPostAndChatId(replyTo, chatId).iterator().next().getMessageId(), gFile));
             }
-            
+
             if (response != null && response.message() != null) {
                 ChatMessage cm = new ChatMessage(null, response.message().messageId(), chatId, globalPost);
                 new TransactionalDBAccess() {
@@ -61,10 +62,32 @@ public abstract class GlobalMediaManager extends MediaManager {
                     }
                 }.execute();
             }
-            
+
         }
     }
-    
+
+    public void notifyUserJoined(GlobalChatRoom gcr, User localUser) {
+        if(gcr == null){
+            return;
+        }
+        List<User> users = User.loadByGcr(gcr).stream().filter(x -> !x.getChatId().equals(localUser.getChatId())).collect(Collectors.toList());
+        for (User user : users) {
+            Boolean isEnglish = user.getLang() == null || user.getLang().equals(Language.English);
+            getBot().execute(new SendMessage(user.getChatId(), isEnglish ? ("admin message: " + user.getNickName() + " joined global room") : ("پیام ادمین: ") + user.getNickName() + " وارد گلوبال روم شد."));
+        }
+    }
+
+    public void notifyUserLeft(GlobalChatRoom gcr, User localUser) {
+        if(gcr == null){
+            return;
+        }
+        List<User> users = User.loadByGcr(gcr).stream().filter(x -> !x.getChatId().equals(localUser.getChatId())).collect(Collectors.toList());
+        for (User user : users) {
+            Boolean isEnglish = user.getLang() == null || user.getLang().equals(Language.English);
+            getBot().execute(new SendMessage(user.getChatId(), isEnglish ? ("admin message: " + user.getNickName() + " left global room") : ("پیام ادمین: ") + user.getNickName() + " گلوبال روم را ترک کرد."));
+        }
+    }
+
     public void sendBatchGlobalPost(List<GlobalPost> gps, Long chatId) {
         if (gps == null) {
             return;
@@ -87,12 +110,12 @@ public abstract class GlobalMediaManager extends MediaManager {
                     continue;
                 }
             }
-            
+
             if (response == null || response.message() == null) {
                 LoggerFactory.getLogger(this.getClass()).error("Send batch fault reply = " + String.valueOf(gp.getReplyTo() != null));
                 continue;
             }
-            
+
             ChatMessage cm = new ChatMessage(null, response.message().messageId(), chatId, gp);
             new TransactionalDBAccess() {
                 @Override
@@ -103,7 +126,7 @@ public abstract class GlobalMediaManager extends MediaManager {
             messageMap.put(gp.getId(), response.message().messageId());
         }
     }
-    
+
     public AbstractSendRequest sendGlobalPost(GlobalPost gp, Long chatId, Integer replyTo, File file) {
         AbstractSendRequest request = null;
         MessageType type = gp.getType();
@@ -140,18 +163,18 @@ public abstract class GlobalMediaManager extends MediaManager {
                 request = new SendVoice(chatId, file).caption(caption);
                 break;
         }
-        
+
         if (replyTo != null) {
             request = request.replyToMessageId(replyTo);
         }
-        
+
         return request;
     }
-    
+
     public AbstractSendRequest sendGlobalPost(GlobalPost gp, Long chatId, Integer replyTo) throws UserInterfaceException {
         return sendGlobalPost(gp, chatId, replyTo, downloadGlobalFile(gp));
     }
-    
+
     public File downloadGlobalFile(GlobalPost gp) throws UserInterfaceException {
         MessageType type = gp.getType();
         if (type.equals(MessageType.Text) || type.equals(MessageType.Location)) {
@@ -162,18 +185,18 @@ public abstract class GlobalMediaManager extends MediaManager {
         }
         return downloadUrl(gp.getContent());
     }
-    
+
     private String getHeader(GlobalPost gp) {
         String pattern = "MM/dd/yyyy HH:mm";
         DateFormat df = new SimpleDateFormat(pattern);
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append(gp.getSender().getNickName());
         sb.append(" - ");
         sb.append(df.format(gp.getDate()));
         return sb.toString();
     }
-    
+
     private String getCaption(GlobalPost gp) {
         StringBuilder sb = new StringBuilder();
         sb.append(getHeader(gp));
@@ -183,5 +206,5 @@ public abstract class GlobalMediaManager extends MediaManager {
         }
         return sb.toString();
     }
-    
+
 }

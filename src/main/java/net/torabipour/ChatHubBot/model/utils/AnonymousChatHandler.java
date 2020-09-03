@@ -20,6 +20,7 @@ import com.pengrad.telegrambot.response.SendResponse;
 import net.torabipour.ChatHubBot.model.anonChat.Chat;
 import net.torabipour.ChatHubBot.model.MessageType;
 import net.torabipour.ChatHubBot.model.User;
+import static net.torabipour.ChatHubBot.model.factory.GlobalPostFactory.isValid;
 import net.torabipour.ChatHubBot.model.factory.MessageFactory;
 
 /**
@@ -39,7 +40,7 @@ public abstract class AnonymousChatHandler {
         };
     }
 
-     public void copyMessageAndForward(Long chatId) throws UserInterfaceException{
+    public void copyMessageAndForward(Long chatId, Boolean isEnglish) throws UserInterfaceException {
         com.pengrad.telegrambot.model.Message message = getUpdate().message();
         com.pengrad.telegrambot.model.User user = message.from();
         String messageText = message.text();
@@ -63,9 +64,13 @@ public abstract class AnonymousChatHandler {
         SendResponse response = null;
         if (replyToMessage == null) {
             if (messageText != null && !messageText.isEmpty()) {
+                if (isValid(messageText)) {
+                    throw new UserInterfaceException(isEnglish ? "ارسال لینک در چت مجاز نیست." : "Links are not allowed in chats.");
+                }
                 response = mediaManager.messageSend(messageText, chatId);
                 type = MessageType.Text;
                 content = messageText;
+                
             } else if (vid != null) {
                 response = mediaManager.sendVideo(chatId, vid, caption);
                 type = MessageType.Video;
@@ -102,6 +107,9 @@ public abstract class AnonymousChatHandler {
         } else {
             Integer originalReply = getReceiveIdBySendId(replyToMessage.messageId());
             if (messageText != null && !messageText.isEmpty()) {
+                if (isValid(messageText)) {
+                    throw new UserInterfaceException(isEnglish ? "ارسال لینک در چت مجاز نیست." : "Links are not allowed in chats.");
+                }
                 mediaManager.messageSendReply(messageText, chatId, originalReply);
                 type = MessageType.Text;
                 content = messageText;

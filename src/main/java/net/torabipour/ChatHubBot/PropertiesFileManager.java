@@ -57,7 +57,7 @@ public class PropertiesFileManager {
     }
 
     public Integer getGlobalRecentNum() {
-        return Integer.valueOf(readConfigFile().getProperty("globalRecentNum", "25"));
+        return Integer.valueOf(readConfigFile().getProperty("globalRecentNum", "5"));
     }
 
     public Integer getUsersShowNum() {

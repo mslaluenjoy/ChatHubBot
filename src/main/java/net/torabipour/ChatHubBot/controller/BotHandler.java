@@ -597,7 +597,7 @@ public abstract class BotHandler {
                             public User getLocalUser() {
                                 return localUser;
                             }
-                        }.copyMessageAndForward(endpoint1.getChatId().equals(message.chat().id()) ? endpoint2.getChatId() : endpoint1.getChatId());
+                        }.copyMessageAndForward(endpoint1.getChatId().equals(message.chat().id()) ? endpoint2.getChatId() : endpoint1.getChatId(), isEnglish);
                     } catch (UserInterfaceException ex) {
                         mediaManager.messageSend(ex.getMessage(), message.chat().id());
                     }
@@ -1007,12 +1007,14 @@ public abstract class BotHandler {
 
                     List<GlobalPost> recentGlobalPosts = GlobalPost.loadRecentPosts(gcr, PropertiesFileManager.getInstance().getGlobalRecentNum());
                     globalMediaManager.sendBatchGlobalPost(recentGlobalPosts, message.chat().id());
+                    globalMediaManager.notifyUserJoined(gcr, localUser);
                     mediaManager.messageSendKeyboard(isEnglish ? gcr.getEnglishPrompt() : gcr.getPersianPromt(), message.chat().id(), isEnglish ? "Leave room" : "خروج");
                 }
                 break;
             case InGlobalChat:
                 if (messageText != null && (messageText.equals("Leave room") || messageText.equals("خروج") || messageText.equals("/restart") || messageText.equals("/start") || messageText.equals("/leaveglobal"))) {
                     localUser.setStatus(UserStatus.Registered);
+                    globalMediaManager.notifyUserLeft(localUser.getGcr(), localUser);
                     localUser.setGcr(null);
                     new TransactionalDBAccess() {
                         @Override

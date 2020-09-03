@@ -14,6 +14,7 @@ import com.pengrad.telegrambot.model.Sticker;
 import com.pengrad.telegrambot.model.Video;
 import com.pengrad.telegrambot.model.Voice;
 import com.pengrad.telegrambot.response.SendResponse;
+import java.net.URL;
 import net.torabipour.ChatHubBot.model.MessageType;
 import net.torabipour.ChatHubBot.model.User;
 import net.torabipour.ChatHubBot.model.globalChat.ChatMessage;
@@ -22,6 +23,7 @@ import net.torabipour.ChatHubBot.model.globalChat.GlobalPost;
 import net.torabipour.ChatHubBot.model.utils.MediaManager;
 import net.torabipour.ChatHubBot.model.utils.UserInterfaceException;
 import java.util.Date;
+import net.torabipour.ChatHubBot.model.Language;
 
 /**
  *
@@ -29,11 +31,11 @@ import java.util.Date;
  */
 public class GlobalPostFactory {
 
-    public static GlobalPost create(com.pengrad.telegrambot.model.Message message, User localUser, MediaManager mediaManager, GlobalChatRoom gcr) throws UserInterfaceException{
+    public static GlobalPost create(com.pengrad.telegrambot.model.Message message, User localUser, MediaManager mediaManager, GlobalChatRoom gcr) throws UserInterfaceException {
         GlobalPost gp = new GlobalPost();
         gp.setSender(localUser);
         gp.setCaption(message.caption());
-        setContentAndType(message, mediaManager, gp);
+        setContentAndType(message, mediaManager, gp, localUser.getLang() == null || localUser.getLang().equals(Language.English));
         gp.setDate(new Date());
         gp.setGcr(gcr);
 
@@ -46,7 +48,7 @@ public class GlobalPostFactory {
         return gp;
     }
 
-    private static void setContentAndType(com.pengrad.telegrambot.model.Message message, MediaManager mediaManager, GlobalPost gp) throws UserInterfaceException{
+    private static void setContentAndType(com.pengrad.telegrambot.model.Message message, MediaManager mediaManager, GlobalPost gp, Boolean isEnglish) throws UserInterfaceException {
         String messageText = message.text();
         Video vid = message.video();
         PhotoSize[] photo = message.photo();
@@ -62,6 +64,9 @@ public class GlobalPostFactory {
         if (messageText != null && !messageText.isEmpty()) {
             type = MessageType.Text;
             content = messageText;
+            if (isValid(content)) {
+                throw new UserInterfaceException(isEnglish ? "ارسال لینک در روم های گلوبال مجاز نیست." : "Links are not allowed in global rooms.");
+            }
         } else if (vid != null) {
             type = MessageType.Video;
             content = mediaManager.getFullPath(vid.fileId());
@@ -92,5 +97,17 @@ public class GlobalPostFactory {
 
         gp.setContent(content);
         gp.setType(type);
+    }
+
+    public static boolean isValid(String url) {
+        /* Try creating a valid URL */
+        try {
+            new URL(url).toURI();
+            return true;
+        } // If there was an Exception 
+        // while creating URL object 
+        catch (Exception e) {
+            return false;
+        }
     }
 }
