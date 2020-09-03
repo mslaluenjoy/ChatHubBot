@@ -23,6 +23,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
+import net.torabipour.ChatHubBot.model.Language;
 import org.hibernate.Session;
 
 /**
@@ -32,9 +33,9 @@ import org.hibernate.Session;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @NamedQueries({
-    @NamedQuery(name = "loadProperMatch", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND chat = NULL AND (requester.sex = :targetSex OR :targetSex = NULL) and (targetSex = :requesterSex OR targetSex = NULL)")
+    @NamedQuery(name = "loadProperMatch", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND chat = NULL AND (requester.sex = :targetSex OR :targetSex = NULL) and (targetSex = :requesterSex OR targetSex = NULL) and requester.lang=:lang")
     ,
-    @NamedQuery(name = "loadProperMatchNoSex", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND chat = NULL")
+    @NamedQuery(name = "loadProperMatchNoSex", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND chat = NULL and requester.lang=:lang")
     ,
     @NamedQuery(name = "loadByRequester", query = "SELECT cr from ChatRequest cr WHERE active = TRUE AND requester = :requester")
 })
@@ -54,7 +55,7 @@ public class ChatRequest {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Chat chat;
-    
+
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date date;
 
@@ -118,33 +119,33 @@ public class ChatRequest {
         this.chat = chat;
     }
 
-    public static List<ChatRequest> loadProperMatch(Sex targetSex, Sex requesterSex) {
+    public static List<ChatRequest> loadProperMatch(Sex targetSex, Sex requesterSex, Language lang) {
         return new DBAccessWithResult<List<ChatRequest>>() {
             @Override
             protected List<ChatRequest> operation(Session session) {
-                return loadProperMatch(targetSex, requesterSex, session);
+                return loadProperMatch(targetSex, requesterSex, lang, session);
             }
         }.execute();
     }
 
-    public static List<ChatRequest> loadProperMatch(Sex targetSex, Sex requesterSex, Session session) {
-        List<ChatRequest> result = session.getNamedQuery("loadProperMatch").setParameter("targetSex", targetSex).setParameter("requesterSex", requesterSex).list();
-        
+    public static List<ChatRequest> loadProperMatch(Sex targetSex, Sex requesterSex, Language lang, Session session) {
+        List<ChatRequest> result = session.getNamedQuery("loadProperMatch").setParameter("targetSex", targetSex).setParameter("requesterSex", requesterSex).setParameter("lang", lang).list();
+
         return result;
     }
 
-    public static List<ChatRequest> loadProperMatchNoSex() {
+    public static List<ChatRequest> loadProperMatchNoSex(Language lang) {
         return new DBAccessWithResult<List<ChatRequest>>() {
             @Override
             protected List<ChatRequest> operation(Session session) {
-                return loadProperMatchNoSex(session);
+                return loadProperMatchNoSex(lang, session);
             }
         }.execute();
     }
 
-    public static List<ChatRequest> loadProperMatchNoSex(Session session) {
-        List<ChatRequest> result = session.getNamedQuery("loadProperMatchNoSex").list();
-        
+    public static List<ChatRequest> loadProperMatchNoSex(Language lang, Session session) {
+        List<ChatRequest> result = session.getNamedQuery("loadProperMatchNoSex").setParameter("lang", lang).list();
+
         return result;
     }
 
@@ -159,7 +160,7 @@ public class ChatRequest {
 
     public static List<ChatRequest> loadByRequester(User requester, Session session) {
         List<ChatRequest> result = session.getNamedQuery("loadByRequester").setParameter("requester", requester).list();
-        
+
         return result;
     }
 

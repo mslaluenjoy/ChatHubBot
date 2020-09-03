@@ -444,7 +444,7 @@ public abstract class BotHandler {
                     }
                 }.execute();
 
-                List<ChatRequest> requests = ChatRequest.loadProperMatch(targetSex, localUser.getSex());
+                List<ChatRequest> requests = ChatRequest.loadProperMatch(targetSex, localUser.getSex(),localUser.getLang());
 
                 if (requests == null || requests.isEmpty()) {
                     sendCanelConnection(message.chat().id(), isEnglish);
