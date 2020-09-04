@@ -8,73 +8,79 @@ package net.torabipour.ChatHubBot.model.botStructure.registration;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import net.torabipour.ChatHubBot.db.TransactionalDBAccess;
-import net.torabipour.ChatHubBot.model.Language;
+import java.util.List;
 import net.torabipour.ChatHubBot.model.User;
 import net.torabipour.ChatHubBot.model.UserStatus;
 import net.torabipour.ChatHubBot.model.botStructure.AbstractRegistrationStep;
 import net.torabipour.ChatHubBot.model.utils.MediaManager;
 import net.torabipour.ChatHubBot.model.utils.UserInterfaceException;
-import org.hibernate.Session;
+import net.torabipour.ChatHubBot.model.utils.location.NominatimReverseGeocodingJAPI;
 
 /**
  *
  * @author mohammad
  */
-public class LanguageSelectStep extends AbstractRegistrationStep {
+public class LocationSelectStep extends AbstractRegistrationStep {
 
-    public LanguageSelectStep(Update update, TelegramBot bot) {
+    public LocationSelectStep(Update update, TelegramBot bot) {
         super(update, bot);
     }
 
     @Override
+    protected List<String> getAbortPhrases() {
+        List<String> aborts = super.getAbortPhrases();
+        aborts.add("Nevermind");
+        aborts.add("بی خیال");
+        return aborts;
+    }
+
+    @Override
     protected UserStatus getAbortUserStatus() {
-        return UserStatus.LanguageSelect;
+        return UserStatus.Registered;
     }
 
     @Override
     protected UserStatus getNextUserStatus() {
-        return UserStatus.SexSelect;
+        return UserStatus.AgeSelect;
     }
 
     @Override
     protected void sendMessageOnAbort(Long chatId, Boolean isEnglish, MediaManager mediaManager) {
-        mediaManager.messageSendKeyboard("زبان خود را انتخاب کنید. \n Choose your language.", chatId, "English 🇬🇧", "Persian 🇮🇷");
+        sendRegistrationSuccessfull(chatId, isEnglish);
+        sendMainMenu(chatId, isEnglish);
     }
 
     @Override
     protected void onOperation(User localUser, Message message, String messageText) throws UserInterfaceException {
-        localUser.setLang(Language.valueOf(messageText.split(" ")[0]));
+        localUser.setLocationAndAddress(message.location(), new NominatimReverseGeocodingJAPI());
         saveLocalUser();
     }
 
-    @Override
-    protected void sendMessageOnSuccess(Long chatId, Boolean isEnglish, MediaManager mediaManager) {
-        mediaManager.messageSendKeyboard(isEnglish ? "Select your sex." : "جنسیت خود را انتخاب کنید.", chatId,
-                new String[]{isEnglish ? "Male 👨‍🦱" : "مرد 👨‍🦱", isEnglish ? "Female 👩" : "زن 👩"});
-    }
-
-    @Override
-    protected void validateInput(Message message, String messageText) throws UserInterfaceException {
-        try {
-            Language.valueOf(messageText.split(" ")[0]);
-        } catch (Exception ex) {
-            throw new UserInterfaceException("مقدار وارد شده اشتباه است.", "Invalid input for language.");
-        }
-    }
-    
     @Override
     protected void onAbort(User localUser, Message message, String messageText) {
     }
 
     @Override
+    protected void sendMessageOnSuccess(Long chatId, Boolean isEnglish, MediaManager mediaManager) {
+        mediaManager.messageSendKeyboard(isEnglish ? "Send your age." : "سن خود را وارد کنید.", chatId, "/cancel");
+    }
+
+    @Override
+    protected void validateInput(Message message, String messageText) throws UserInterfaceException {
+        if (message.location() == null || message.location().latitude() == null || message.location().longitude() == null) {
+            throw new UserInterfaceException("لطفا یک لوکیشن معتبر بفرستید.", "Invalid input for location.");
+        }
+    }
+
+    @Override
     protected void onInvalidInput(User localUser, Message message, String messageText) {
-        sendMessageOnAbort(chatId, isEnglish, mediaManager);
+        mediaManager.locationRequestSend(isEnglish ? "Send your current location." : "موقعیت جغرافیایی خود را ارسال نمایید.",
+                chatId, isEnglish ? "Send Location" : "ارسال موقعیت", isEnglish);
     }
 
     @Override
     protected void onUnsuccessfullOperation(User localUser, Message message, String messageText) {
-        sendMessageOnAbort(chatId, isEnglish, mediaManager);
+        onInvalidInput(localUser, message, messageText);
     }
 
 }

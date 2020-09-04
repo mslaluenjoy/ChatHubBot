@@ -23,12 +23,7 @@ public class TelegramBotManager {
     private TelegramBotManager() {
         bot = new TelegramBot(PropertiesFileManager.getInstance().getBotToken());
         bot.execute(new SetWebhook().url(PropertiesFileManager.getInstance().getIpAddress()));
-        handler = new BotHandler() {
-            @Override
-            protected TelegramBot getBot() {
-                return bot;
-            }
-        };
+        handler = new BotHandler(bot);
     }
 
     public static TelegramBotManager getInstance() {

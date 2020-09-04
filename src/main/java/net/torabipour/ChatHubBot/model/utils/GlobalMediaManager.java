@@ -67,7 +67,7 @@ public abstract class GlobalMediaManager extends MediaManager {
     }
 
     public void notifyUserJoined(GlobalChatRoom gcr, User localUser) {
-        if(gcr == null){
+        if (gcr == null) {
             return;
         }
         List<User> users = User.loadByGcr(gcr).stream().filter(x -> !x.getChatId().equals(localUser.getChatId())).collect(Collectors.toList());
@@ -78,7 +78,7 @@ public abstract class GlobalMediaManager extends MediaManager {
     }
 
     public void notifyUserLeft(GlobalChatRoom gcr, User localUser) {
-        if(gcr == null){
+        if (gcr == null) {
             return;
         }
         List<User> users = User.loadByGcr(gcr).stream().filter(x -> !x.getChatId().equals(localUser.getChatId())).collect(Collectors.toList());
@@ -127,7 +127,7 @@ public abstract class GlobalMediaManager extends MediaManager {
         }
     }
 
-    public AbstractSendRequest sendGlobalPost(GlobalPost gp, Long chatId, Integer replyTo, File file) {
+    public AbstractSendRequest sendGlobalPost(GlobalPost gp, Long chatId, Integer replyTo, File file) throws UserInterfaceException {
         AbstractSendRequest request = null;
         MessageType type = gp.getType();
         String caption = getCaption(gp);
@@ -143,6 +143,9 @@ public abstract class GlobalMediaManager extends MediaManager {
                 break;
             case Location:
                 String content = gp.getContent();
+                if (content == null || content.isEmpty() || content.split("-").length != 2) {
+                    throw new UserInterfaceException("خطا در ارسال موقعیت جغرافیایی.","Could not send location.");
+                }
                 String latStr = content.split("-")[0];
                 String longStr = content.split("-")[1];
                 request = new SendLocation(chatId, Float.valueOf(latStr), Float.valueOf(longStr));

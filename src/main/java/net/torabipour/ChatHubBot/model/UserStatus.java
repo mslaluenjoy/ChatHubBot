@@ -27,7 +27,8 @@ public enum UserStatus {
     ReadingAnonMessage("درحال خواندن پیام", "checking inbox"),
     JoiningLocalRoom("درحال چت گلوبال", "joining local room"),
     ViewingProfile("درحال مشاهده پروفایل دیگران", "viewing profile"),
-    FindingNearby("درحال جستجوی افراد نزدیک", "finding nearby");
+    FindingNearby("درحال جستجوی افراد نزدیک", "finding nearby"),
+    AcceptingChatRequest("درحال چت", "in chat");
     
     private String persian;
     private String english;

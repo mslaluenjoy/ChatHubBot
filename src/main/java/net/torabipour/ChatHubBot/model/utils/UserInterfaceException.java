@@ -10,10 +10,6 @@ public class UserInterfaceException extends Exception {
     private String persian;
     private String english;
 
-    public UserInterfaceException(String message) {
-        super(message);
-    }
-
     public UserInterfaceException(String persian, String english) {
         super("Exception");
         this.persian = persian;

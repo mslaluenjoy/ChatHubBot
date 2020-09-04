@@ -209,11 +209,11 @@ public abstract class MediaManager {
         com.pengrad.telegrambot.model.File file = getBot().execute(getFile).file();
         if (file == null) {
             LoggerFactory.getLogger(this.getClass()).error("telegramFileId : " + telegramFileId);
-            throw new UserInterfaceException("Unable to send file. file not found.");
+            throw new UserInterfaceException("خطا در ارسال فایل.","Unable to send file. file not found.");
         }
         if (PropertiesFileManager.getInstance().checkForFileSize()) {
             if (file.fileSize() > PropertiesFileManager.getInstance().getMaxMediaSizeByte()) {
-                throw new UserInterfaceException("Media size too large. maximum allowed in mega bytes : " + PropertiesFileManager.getInstance().getMaxMediaSizeMB());
+                throw new UserInterfaceException("سایز فایل ارسالی از حد مجاز ۱۰ مگابایت بیشتر است.","Media size too large. maximum allowed in mega bytes : " + PropertiesFileManager.getInstance().getMaxMediaSizeMB());
             }
         }
         String fullPath = getBot().getFullFilePath(file);
@@ -231,7 +231,7 @@ public abstract class MediaManager {
             FileUtils.copyURLToFile(new URL(url), toSend);
             return toSend;
         } catch (Exception ex) {
-            throw new UserInterfaceException("Unable to send file");
+            throw new UserInterfaceException("خطا در ارسال فایل.","Unable to send file");
         }
     }
 
@@ -241,7 +241,7 @@ public abstract class MediaManager {
             FileUtils.copyURLToFile(new URL(url), toSend);
             return toSend;
         } catch (Exception ex) {
-            throw new UserInterfaceException("Unable to send file");
+            throw new UserInterfaceException("خطا در ارسال فایل.","Unable to send file");
         }
     }
 

@@ -53,7 +53,7 @@ public class PrivateMessageFactory {
             type = MessageType.Text;
             content = messageText;
             if (isValid(content)) {
-                throw new UserInterfaceException(isEnglish ? "ارسال لینک در چت مجاز نیست." : "Links are not allowed in chats.");
+                throw new UserInterfaceException("ارسال لینک در چت مجاز نیست." , "Links are not allowed in chats.");
             }
         } else if (vid != null) {
             type = MessageType.Video;

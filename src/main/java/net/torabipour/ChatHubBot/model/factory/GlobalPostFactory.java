@@ -23,6 +23,7 @@ import net.torabipour.ChatHubBot.model.globalChat.GlobalPost;
 import net.torabipour.ChatHubBot.model.utils.MediaManager;
 import net.torabipour.ChatHubBot.model.utils.UserInterfaceException;
 import java.util.Date;
+import net.torabipour.ChatHubBot.PropertiesFileManager;
 import net.torabipour.ChatHubBot.model.Language;
 
 /**
@@ -68,7 +69,7 @@ public class GlobalPostFactory {
             type = MessageType.Text;
             content = messageText;
             if (isValid(content)) {
-                throw new UserInterfaceException(isEnglish ? "ارسال لینک در روم های گلوبال مجاز نیست." : "Links are not allowed in global rooms.");
+                throw new UserInterfaceException("ارسال لینک در روم های گلوبال مجاز نیست." , "Links are not allowed in global rooms.");
             }
         } else if (vid != null) {
             type = MessageType.Video;
@@ -103,6 +104,11 @@ public class GlobalPostFactory {
     }
 
     public static boolean isValid(String url) {
+        
+        if(url == null || url.contains(PropertiesFileManager.getInstance().getBotName())){
+            return false;
+        }
+        
         /* Try creating a valid URL */
         try {
             new URL(url).toURI();

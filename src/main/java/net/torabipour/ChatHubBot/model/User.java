@@ -75,7 +75,7 @@ public class User implements Serializable {
     private Boolean exposing;
 
     private String telegramId;
-    
+
     private Date lastLogin;
 
     private String telegramUserName;
@@ -283,7 +283,7 @@ public class User implements Serializable {
 
     public static List<User> loadAllExposingByCityAndSex(String city, Sex sex, Session session) {
         List<User> result = session.getNamedQuery("loadAllExposingByCityAndSex").setParameter("city", city).setParameter("sex", sex).setMaxResults(PropertiesFileManager.getInstance().getUsersShowNum()).list();
-       
+
         return result;
     }
 
@@ -298,7 +298,7 @@ public class User implements Serializable {
 
     public static List<User> loadAllExposingByCity(String city, Session session) {
         List<User> result = session.getNamedQuery("loadAllExposingByCity").setParameter("city", city).setMaxResults(PropertiesFileManager.getInstance().getUsersShowNum()).list();
-        
+
         return result;
     }
 
@@ -313,7 +313,7 @@ public class User implements Serializable {
 
     public static List<User> loadByGcr(GlobalChatRoom gcr, Session session) {
         List<User> result = session.getNamedQuery("loadByGcr").setParameter("gcr", gcr).list();
-        
+
         return result;
     }
 
@@ -331,8 +331,7 @@ public class User implements Serializable {
         Location loc = new Location(location.latitude(), location.longitude());
         Address address = geo.getAdress(Double.valueOf(loc.getLatitude()), Double.valueOf(loc.getLongitude()));
         if (address.getCity() == null || address.getCity() == null) {
-            Boolean isEnglish = Language.English.equals(lang);
-            throw new UserInterfaceException(isEnglish ? "Please send a valid location." : "لطفا یک موقعیت جغرافیایی معتبر بفرستید.");
+            throw new UserInterfaceException("لطفا یک موقعیت جغرافیایی معتبر بفرستید.", "Please send a valid location.");
         }
         loc.setCity(address.getCity());
 

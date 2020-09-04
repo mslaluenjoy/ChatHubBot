@@ -16,6 +16,15 @@ import com.pengrad.telegrambot.model.Sticker;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.Video;
 import com.pengrad.telegrambot.model.Voice;
+import com.pengrad.telegrambot.request.SendAnimation;
+import com.pengrad.telegrambot.request.SendAudio;
+import com.pengrad.telegrambot.request.SendDocument;
+import com.pengrad.telegrambot.request.SendLocation;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.request.SendSticker;
+import com.pengrad.telegrambot.request.SendVideo;
+import com.pengrad.telegrambot.request.SendVoice;
 import com.pengrad.telegrambot.response.SendResponse;
 import net.torabipour.ChatHubBot.model.anonChat.Chat;
 import net.torabipour.ChatHubBot.model.MessageType;
@@ -65,7 +74,7 @@ public abstract class AnonymousChatHandler {
         if (replyToMessage == null) {
             if (messageText != null && !messageText.isEmpty()) {
                 if (isValid(messageText)) {
-                    throw new UserInterfaceException(isEnglish ? "ارسال لینک در چت مجاز نیست." : "Links are not allowed in chats.");
+                    throw new UserInterfaceException("ارسال لینک در چت مجاز نیست." , "Links are not allowed in chats.");
                 }
                 response = mediaManager.messageSend(messageText, chatId);
                 type = MessageType.Text;
@@ -108,7 +117,7 @@ public abstract class AnonymousChatHandler {
             Integer originalReply = getReceiveIdBySendId(replyToMessage.messageId());
             if (messageText != null && !messageText.isEmpty()) {
                 if (isValid(messageText)) {
-                    throw new UserInterfaceException(isEnglish ? "ارسال لینک در چت مجاز نیست." : "Links are not allowed in chats.");
+                    throw new UserInterfaceException( "ارسال لینک در چت مجاز نیست.", "Links are not allowed in chats.");
                 }
                 response =mediaManager.messageSendReply(messageText, chatId, originalReply);
                 type = MessageType.Text;

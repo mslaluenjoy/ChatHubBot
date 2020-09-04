@@ -10,6 +10,7 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import net.torabipour.ChatHubBot.db.TransactionalDBAccess;
 import net.torabipour.ChatHubBot.model.Language;
+import net.torabipour.ChatHubBot.model.Sex;
 import net.torabipour.ChatHubBot.model.User;
 import net.torabipour.ChatHubBot.model.UserStatus;
 import net.torabipour.ChatHubBot.model.botStructure.AbstractRegistrationStep;
@@ -21,60 +22,65 @@ import org.hibernate.Session;
  *
  * @author mohammad
  */
-public class LanguageSelectStep extends AbstractRegistrationStep {
+public class SexSelectStep extends AbstractRegistrationStep {
 
-    public LanguageSelectStep(Update update, TelegramBot bot) {
+    public SexSelectStep(Update update, TelegramBot bot) {
         super(update, bot);
     }
 
     @Override
     protected UserStatus getAbortUserStatus() {
-        return UserStatus.LanguageSelect;
-    }
-
-    @Override
-    protected UserStatus getNextUserStatus() {
         return UserStatus.SexSelect;
     }
 
     @Override
+    protected UserStatus getNextUserStatus() {
+        return UserStatus.NickNameSelect;
+    }
+
+    @Override
     protected void sendMessageOnAbort(Long chatId, Boolean isEnglish, MediaManager mediaManager) {
-        mediaManager.messageSendKeyboard("زبان خود را انتخاب کنید. \n Choose your language.", chatId, "English 🇬🇧", "Persian 🇮🇷");
-    }
-
-    @Override
-    protected void onOperation(User localUser, Message message, String messageText) throws UserInterfaceException {
-        localUser.setLang(Language.valueOf(messageText.split(" ")[0]));
-        saveLocalUser();
-    }
-
-    @Override
-    protected void sendMessageOnSuccess(Long chatId, Boolean isEnglish, MediaManager mediaManager) {
         mediaManager.messageSendKeyboard(isEnglish ? "Select your sex." : "جنسیت خود را انتخاب کنید.", chatId,
                 new String[]{isEnglish ? "Male 👨‍🦱" : "مرد 👨‍🦱", isEnglish ? "Female 👩" : "زن 👩"});
     }
 
     @Override
+    protected void onOperation(User localUser, Message message, String messageText) throws UserInterfaceException {
+        localUser.setSex(localUser.getLang().equals(Language.English) ? Sex.valueOf(messageText.split(" ")[0]) : (messageText.contains("مرد") ? Sex.Male : Sex.Female));
+        saveLocalUser();
+    }
+
+    @Override
+    protected void sendMessageOnSuccess(Long chatId, Boolean isEnglish, MediaManager mediaManager) {
+        mediaManager.messageSend(isEnglish
+                ? "Choose yourself a user name which is shown to other users. \n"
+                : "برای خود نام کاربری انتخاب کنید. \n توجه کنید که این نام قابل مشاهده توسط سایر کاربران این ربات خواهد بود.", chatId);
+    }
+
+    @Override
     protected void validateInput(Message message, String messageText) throws UserInterfaceException {
-        try {
-            Language.valueOf(messageText.split(" ")[0]);
-        } catch (Exception ex) {
-            throw new UserInterfaceException("مقدار وارد شده اشتباه است.", "Invalid input for language.");
+        if (messageText == null || messageText.split(" ").length != 2) {
+            throw new UserInterfaceException("مقدار وارد شده اشتباه است.", "Invalid input for sex.");
+        }
+        String sexPharase = messageText.split(" ")[0];
+        if ("مرد".equals(sexPharase) && "زن".equals(sexPharase) && "Male".equals(sexPharase) && "Female".equals(sexPharase)) {
+            throw new UserInterfaceException("مقدار وارد شده اشتباه است.", "Invalid input for sex.");
         }
     }
-    
+
     @Override
     protected void onAbort(User localUser, Message message, String messageText) {
     }
 
     @Override
     protected void onInvalidInput(User localUser, Message message, String messageText) {
-        sendMessageOnAbort(chatId, isEnglish, mediaManager);
+        mediaManager.messageSendKeyboard(isEnglish ? "Select your sex." : "جنسیت خود را انتخاب کنید.", chatId,
+                new String[]{isEnglish ? "Male 👨‍🦱" : "مرد 👨‍🦱", isEnglish ? "Female 👩" : "زن 👩"});
     }
 
     @Override
     protected void onUnsuccessfullOperation(User localUser, Message message, String messageText) {
-        sendMessageOnAbort(chatId, isEnglish, mediaManager);
+        onInvalidInput(localUser, message, messageText);
     }
 
 }
