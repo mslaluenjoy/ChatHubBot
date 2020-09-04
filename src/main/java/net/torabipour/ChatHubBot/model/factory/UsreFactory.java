@@ -63,7 +63,7 @@ public class UsreFactory {
                     session.save(newLocalUser);
                 }
             }.execute();
-            return localUser;
+            return newLocalUser;
         }
 
         localUser.setTelegramUserName(user.username());
