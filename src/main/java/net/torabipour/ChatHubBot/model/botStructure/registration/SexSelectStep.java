@@ -46,7 +46,9 @@ public class SexSelectStep extends AbstractRegistrationStep {
 
     @Override
     protected void onOperation(User localUser, Message message, String messageText) throws UserInterfaceException {
-        localUser.setSex(localUser.getLang().equals(Language.English) ? Sex.valueOf(messageText.split(" ")[0]) : (messageText.contains("مرد") ? Sex.Male : Sex.Female));
+        String val = messageText.split(" ")[0];
+        Sex sex = ("مرد".equals(val) || "Male".equals(val)) ? Sex.Male : Sex.Female;
+        localUser.setSex(sex);
         saveLocalUser();
     }
 
@@ -63,7 +65,7 @@ public class SexSelectStep extends AbstractRegistrationStep {
             throw new UserInterfaceException("مقدار وارد شده اشتباه است.", "Invalid input for sex.");
         }
         String sexPharase = messageText.split(" ")[0];
-        if ("مرد".equals(sexPharase) && "زن".equals(sexPharase) && "Male".equals(sexPharase) && "Female".equals(sexPharase)) {
+        if (!"مرد".equals(sexPharase) && !"زن".equals(sexPharase) && !"Male".equals(sexPharase) && !"Female".equals(sexPharase)) {
             throw new UserInterfaceException("مقدار وارد شده اشتباه است.", "Invalid input for sex.");
         }
     }
