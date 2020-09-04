@@ -35,9 +35,20 @@ public class SelectingGlobalChatHandler extends AbstractStateHandler {
     }
 
     @Override
+    protected List<String> getAbortPhrases() {
+        List<String> aborts = super.getAbortPhrases();
+        aborts.add("Back");
+        aborts.add("بازگشت");
+        return aborts;
+    }
+
+    @Override
     protected void validateInput(Message message, String messageText) throws UserInterfaceException {
+
         if (message == null || GlobalChatRoom.loadByName(messageText) == null) {
-            throw new UserInterfaceException("نام گلوبال روم وارد شده معتبر نیست.", "Invalid global room name.");
+            if (!getAbortPhrases().contains(messageText)) {
+                throw new UserInterfaceException("نام گلوبال روم وارد شده معتبر نیست.", "Invalid global room name.");
+            }
         }
     }
 
