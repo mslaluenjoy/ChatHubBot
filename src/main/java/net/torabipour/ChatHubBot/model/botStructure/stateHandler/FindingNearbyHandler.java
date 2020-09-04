@@ -41,6 +41,9 @@ public class FindingNearbyHandler extends AbstractStateHandler {
 
     @Override
     protected void validateInput(Message message, String messageText) throws UserInterfaceException {
+        if(localUser.getLocation() == null || localUser.getLocation().getCity() == null){
+            throw new UserInterfaceException("جهت استفاده از این ویژگی باید موقعیت جغرافیایی خود را از طریق پنل ویرایش پروفایل ست کنید.", "To use this feature you have to specify your location in your profile via Edit Profile button.");
+        }
     }
 
     @Override
