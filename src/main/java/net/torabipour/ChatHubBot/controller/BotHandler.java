@@ -29,7 +29,8 @@ public class BotHandler {
     public void handleUpdate(Update update) {
 
         User localUser = new UsreFactory().createOrFetchUser(update);
-        if (localUser.getStatus().equals(UserStatus.LanguageSelect) && localUser.getLang() == null) {
+        if (localUser.getStatus().equals(UserStatus.LanguageSelect) && localUser.getLang() == null && (update.message() != null && update.message().text() != null
+                && !update.message().text().contains("English") && !update.message().text().contains("Persian"))) {
             sendLanguageSelect(update.message().chat().id());
             return;
         }
